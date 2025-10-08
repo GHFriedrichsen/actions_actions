@@ -1,0 +1,50 @@
+name: changelog
+
+on:
+  push:
+
+jobs:
+  update-changelog:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v3
+
+      - name: Configurar Git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+
+      - name: Pegar mensagens dos commits
+        id: get_commits
+        run: |
+          echo "COMMITS<<EOF" >> $GITHUB_OUTPUT
+          git log -1 --pretty=format:"%s" >> $GITHUB_OUTPUT
+          echo "" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Atualizar changelog
+        run: |
+          COMMIT_MESSAGE="${{ steps.get_commits.outputs.COMMITS }}"
+          DATE=$(date +%Y-%m-%d)
+
+          # Cria changelog se não existir
+          touch CHANGELOG.md
+
+          # Conta quantas entradas com a data atual já existem
+          COUNT=$(grep "^$DATE" CHANGELOG.md | wc -l)
+          
+          if [ "$COUNT" -eq "0" ]; then
+            PREFIX="$DATE"
+          else
+            PREFIX="$DATE +$COUNT"
+          fi
+
+          echo "$PREFIX - $COMMIT_MESSAGE" >> CHANGELOG.md
+
+      - name: Commitar changelog
+        run: |
+          git add CHANGELOG.md
+          git commit -m "chore: update changelog"
+          git push
