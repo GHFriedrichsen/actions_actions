@@ -29,12 +29,12 @@ jobs:
           fi
           
           # Adiciona a nova entrada com data e hora
-          sed -i "s|## Changelog|## Changelog\n- $date( '+%Y-%m-%d %H:%M') - $COMMIT_MESSAGE|" README.md
+          sed -i "s|## Changelog|## Changelog\n- $(date '+%Y-%m-%d %H:%M') - $COMMIT_MESSAGE|" README.md
 
       - name: Commit changes
         run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "GHFriedrichsen"
+          git config user.email "gabriel.h.friedrichsen@gmail.com"
           git add README.md
           git commit -m "docs: update changelog with last commit message" || echo "No changes to commit"
           git push
